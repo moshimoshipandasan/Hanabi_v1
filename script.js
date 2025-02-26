@@ -538,8 +538,8 @@ function generateFireworkFestivalPattern() {
         { xMin: 0.6, xMax: 0.8, yMin: 0.2, yMax: 0.4 }
     ];
     
-    // 各エリアで複数の花火を打ち上げるパターンを生成（数を増やす）
-    for (let i = 0; i < 40; i++) {
+// 各エリアで複数の花火を打ち上げるパターンを生成（負荷軽減のため数を調整）
+    for (let i = 0; i < 10; i++) {
         const area = areas[i % areas.length];
         const x = (area.xMin + Math.random() * (area.xMax - area.xMin)) * canvasWidth;
         const y = (area.yMin + Math.random() * (area.yMax - area.yMin)) * canvasHeight;
@@ -551,8 +551,8 @@ function generateFireworkFestivalPattern() {
         // 色をバランスよく選択
         const colorIndex = Math.floor(Math.random() * colors.length);
         
-        // 打ち上げるタイミングを計算（前の花火から0.2〜1秒後、間隔を短くする）
-        const timing = (i === 0) ? 0 : launchPattern[i-1].timing + 200 + Math.random() * 800;
+        // 打ち上げるタイミングを計算（前の花火から0.5〜1.5秒後、間隔を長くする）
+        const timing = (i === 0) ? 0 : launchPattern[i-1].timing + 500 + Math.random() * 1000;
         
         // 花火のサイズ（大きさのバリエーション）
         const size = 0.8 + Math.random() * 0.4;
@@ -567,9 +567,9 @@ function generateFireworkFestivalPattern() {
         });
     }
     
-    // フィナーレ：最後に一斉に打ち上げるパターンを追加（数を増やす）
-    const finaleDelay = launchPattern[launchPattern.length - 1].timing + 2000;
-    for (let i = 0; i < 20; i++) {
+    // フィナーレ：最後に一斉に打ち上げるパターンを追加（負荷軽減のため数を調整）
+    const finaleDelay = launchPattern[launchPattern.length - 1].timing + 3000;
+    for (let i = 0; i < 5; i++) {
         const x = 0.1 + Math.random() * 0.8 * canvasWidth;
         const y = 0.1 + Math.random() * 0.3 * canvasHeight;
         const type = ['circle', 'chrysanthemum', 'willow'][Math.floor(Math.random() * 3)];
