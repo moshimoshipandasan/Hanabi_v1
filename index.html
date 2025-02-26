@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>花火シミュレータ</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Web Audio APIを使用するための設定 -->
+    <script>
+        // オーディオコンテキストを初期化
+        let audioContext;
+        
+        // ユーザーインタラクション後にオーディオコンテキストを初期化する関数
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                document.removeEventListener('click', initAudio);
+                console.log('Audio initialized');
+            }
+        }
+        
+        // ユーザーインタラクションを待つ
+        document.addEventListener('click', initAudio);
+    </script>
 </head>
 <body>
     <div class="container">

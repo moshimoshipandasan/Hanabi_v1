@@ -424,10 +424,110 @@ class Firework {
         }
     }
 
-    // 爆発音の再生（ユーザーインタラクション後のみ）
+// 爆発音の再生
     playExplosionSound() {
-        // 音声は再生しない（ブラウザの制限により、ユーザーインタラクションが必要）
-        // 必要に応じて後で有効にできます
+        if (typeof audioContext !== 'undefined') {
+            try {
+                // 「ドカーン」という迫力ある爆発音
+                
+                // 1. 低音の「ドン」という音（メインの爆発音）
+                const mainOsc = audioContext.createOscillator();
+                const mainGain = audioContext.createGain();
+                
+                // より低い周波数で開始し、ゆっくり減衰させる
+                mainOsc.type = 'sine';
+                mainOsc.frequency.setValueAtTime(80, audioContext.currentTime);
+                mainOsc.frequency.exponentialRampToValueAtTime(30, audioContext.currentTime + 1.0);
+                
+                // 音量を大きくして迫力を出す
+                mainGain.gain.setValueAtTime(1.0, audioContext.currentTime);
+                mainGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.2);
+                
+                mainOsc.connect(mainGain);
+                mainGain.connect(audioContext.destination);
+                
+                // 2. 「ドカッ」という衝撃音
+                const impactOsc = audioContext.createOscillator();
+                const impactGain = audioContext.createGain();
+                
+                impactOsc.type = 'triangle';
+                impactOsc.frequency.setValueAtTime(200, audioContext.currentTime);
+                impactOsc.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.3);
+                
+                impactGain.gain.setValueAtTime(0.8, audioContext.currentTime);
+                impactGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                
+                impactOsc.connect(impactGain);
+                impactGain.connect(audioContext.destination);
+                
+                // 3. ノイズ成分（爆発の「バリバリ」という音）
+                const bufferSize = 4096;
+                const noiseNode = audioContext.createScriptProcessor(bufferSize, 1, 1);
+                const noiseGain = audioContext.createGain();
+                
+                noiseNode.onaudioprocess = function(e) {
+                    const output = e.outputBuffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        // ホワイトノイズ（バリバリという音）
+                        output[i] = Math.random() * 2 - 1;
+                    }
+                };
+                
+                // ノイズにフィルターを適用
+                const bpFilter = audioContext.createBiquadFilter();
+                bpFilter.type = 'bandpass';
+                bpFilter.frequency.value = 700;
+                bpFilter.Q.value = 1.0;
+                
+                noiseGain.gain.setValueAtTime(0.7, audioContext.currentTime);
+                noiseGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                noiseNode.connect(bpFilter);
+                bpFilter.connect(noiseGain);
+                noiseGain.connect(audioContext.destination);
+                
+                // 4. 残響音（「パチパチ」という音）
+                setTimeout(() => {
+                    const echoNoiseNode = audioContext.createScriptProcessor(bufferSize, 1, 1);
+                    const echoGain = audioContext.createGain();
+                    
+                    echoNoiseNode.onaudioprocess = function(e) {
+                        const output = e.outputBuffer.getChannelData(0);
+                        for (let i = 0; i < bufferSize; i++) {
+                            // スパース（まばら）なノイズでパチパチ感を出す
+                            output[i] = Math.random() > 0.8 ? Math.random() * 2 - 1 : 0;
+                        }
+                    };
+                    
+                    echoGain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    echoGain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+                    
+                    echoNoiseNode.connect(echoGain);
+                    echoGain.connect(audioContext.destination);
+                    
+                    // 短い時間で停止
+                    setTimeout(() => {
+                        echoNoiseNode.disconnect();
+                    }, 800);
+                }, 200); // 爆発音の少し後に再生
+                
+                // 音を再生
+                mainOsc.start();
+                impactOsc.start();
+                
+                // 音を停止
+                mainOsc.stop(audioContext.currentTime + 1.2);
+                impactOsc.stop(audioContext.currentTime + 0.3);
+                
+                // ノイズを停止（タイムアウトで）
+                setTimeout(() => {
+                    noiseNode.disconnect();
+                }, 500);
+                
+            } catch (e) {
+                console.error('爆発音の再生に失敗しました:', e);
+            }
+        }
     }
 
     // 花火の更新
@@ -513,10 +613,43 @@ function launchFirework(x, y) {
     playLaunchSound();
 }
 
-// 打ち上げ音の再生（ユーザーインタラクション後のみ）
+// 打ち上げ音の再生
 function playLaunchSound() {
-    // 音声は再生しない（ブラウザの制限により、ユーザーインタラクションが必要）
-    // 必要に応じて後で有効にできます
+    if (typeof audioContext !== 'undefined') {
+        try {
+            // 「しゅーー」という打ち上げ音
+            const bufferSize = 4096;
+            const noiseNode = audioContext.createScriptProcessor(bufferSize, 1, 1);
+            const gainNode = audioContext.createGain();
+            
+            noiseNode.onaudioprocess = function(e) {
+                const output = e.outputBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = Math.random() * 2 - 1;
+                }
+            };
+            
+            // ハイパスフィルターでシュー音を強調
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.value = 1000;
+            
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            noiseNode.connect(filter);
+            filter.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            // 一定時間後にノイズを停止
+            setTimeout(() => {
+                noiseNode.disconnect();
+            }, 500);
+            
+        } catch (e) {
+            console.error('打ち上げ音の再生に失敗しました:', e);
+        }
+    }
 }
 
 // プロの職人による花火大会モード
