@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>花火シミュレータ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <canvas id="fireworks"></canvas>
+        <div class="controls">
+            <button id="launch-btn">花火を打ち上げる</button>
+            <div class="options">
+                <label>
+                    <input type="radio" name="firework-type" value="random" checked> ランダム
+                </label>
+                <label>
+                    <input type="radio" name="firework-type" value="circle"> 円形
+                </label>
+                <label>
+                    <input type="radio" name="firework-type" value="chrysanthemum"> 菊型
+                </label>
+                <label>
+                    <input type="radio" name="firework-type" value="willow"> 柳型
+                </label>
+            </div>
+            <div class="color-options">
+                <label>
+                    <input type="radio" name="color-option" value="random" checked> ランダム色
+                </label>
+                <label>
+                    <input type="radio" name="color-option" value="red"> 赤
+                </label>
+                <label>
+                    <input type="radio" name="color-option" value="blue"> 青
+                </label>
+                <label>
+                    <input type="radio" name="color-option" value="green"> 緑
+                </label>
+                <label>
+                    <input type="radio" name="color-option" value="gold"> 金
+                </label>
+            </div>
+        </div>
+        <!-- クリック機能は削除されました -->
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
